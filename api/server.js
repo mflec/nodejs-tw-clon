@@ -2,14 +2,15 @@ const express = require('express');
 const cookieparser = require('cookie-parser');
 const session = require('express-session');
 const morgan = require('morgan');
-const { Tweet, conn } = require('./db');
-const { redirectLogin } = require('./middlewares/redirectLogin');
-const { redirectHome } = require('./middlewares/redirectHome');
-const { postlogin, getlogin } = require('./controllers/login');
-const { postregister, getregister } = require('./controllers/register');
-const { posthome, gethome } = require('./controllers/home');
-const { getindex } = require('./controllers/getindex');
-const { gettweets } = require('./controllers/gettweets')
+const { Tweet, conn } = require('./src/db');
+const { redirectLogin } = require('./src/middlewares/redirectLogin');
+const { redirectHome } = require('./src/middlewares/redirectHome');
+const { postlogin, getlogin } = require('./src/controllers/login');
+const { postregister, getregister } = require('./src/controllers/register');
+const { posthome, gethome } = require('./src/controllers/home');
+const { getindex } = require('./src/controllers/getindex');
+const { gettweets } = require('./src/controllers/gettweets');
+const cors = require("cors");
 require('dotenv').config();
 
 const app = express();
@@ -17,12 +18,20 @@ const app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+app.use(express.json({ limit: '50mb' }));
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+});
 
 // middleware's 
 // -----------------------------------------------
 
 app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(cookieparser());
 app.use(express.static('views'));
@@ -41,6 +50,8 @@ app.use((req, res, next) => {
   console.log(req.session);
   next();
 });
+
+app.use(cors());
 
 //  GET's
 // ------------------------------------------------------------------------------
@@ -103,6 +114,3 @@ conn.sync({force: false}).then(() => {
     }
   });
 });
-
-
-
