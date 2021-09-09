@@ -14,24 +14,13 @@ const cors = require("cors");
 require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 3001
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-app.use(express.json({ limit: '50mb' }));
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    next();
-});
-
 // middleware's 
 // -----------------------------------------------
-
-app.use(morgan('dev'));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use(cookieparser());
 app.use(express.static('views'));
@@ -46,9 +35,16 @@ app.use(session(
   }
 ));
 
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(morgan('dev'));
+
 app.use((req, res, next) => {
-  console.log(req.session);
-  next();
+    res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
 });
 
 app.use(cors());
@@ -106,11 +102,11 @@ app.get('/clear', (req, res) => {
 //------------------------------------------------------------------
 
 conn.sync({force: false}).then(() => {
-  app.listen(3001, (err) => {
+  app.listen(PORT, (err) => {
     if (err) {
       console.log(err);
     } else {
-      console.log('Listening on port ' + 3001);
+      console.log('Listening on port ' + PORT);
     }
   });
 });
