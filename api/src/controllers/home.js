@@ -4,16 +4,16 @@ const { v4: uuidv4 } = require('uuid');
 const posthome = async (req, res) => {
     const { content } = req.body;
     const username = req.session.userId
-
+    
     try {
-        const tweet = await Tweet.create({id: uuidv4(), content, username: req.session.userId });
+        const tweet = await Tweet.create({id: uuidv4(), content, username: username });
         const user = await User.findOne({ where: { username: username } });
         await user.addTweets(tweet);
         return res.redirect('/home');
 
     } catch (error) {
         console.log(error)
-        return res.redirect('/home');
+        res.status(500).send('Upss 😥, something went wrong');
     }
 }
 

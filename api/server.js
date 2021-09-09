@@ -101,7 +101,7 @@ app.get('/clear', (req, res) => {
 
 //------------------------------------------------------------------
 
-conn.sync({force: true}).then(() => {
+conn.sync({force: false}).then(() => {
   app.listen(PORT, (err) => {
     if (err) {
       console.log(err);
